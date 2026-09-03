@@ -1,0 +1,14 @@
+gvkey
+cid
+cnms
+ctype
+salecs
+sid
+srcdate
+cgvkey
+scusip
+stic
+conm
+ccusip
+ctic
+cconm

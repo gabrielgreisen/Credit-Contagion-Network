@@ -1,0 +1,37 @@
+# macOS
+.DS_Store
+
+# API keys
+keys/
+
+# Caches and tooling
+.claude/
+__pycache__/
+*.pyc
+
+# Data - sensitive/large files
+data/raw/compustat/
+data/raw/crsp/
+data/raw/trace/
+data/raw/moodys_orbis/
+data/raw/LSEG/
+data/raw/bordex/
+data/raw/factset/
+data/raw/WRDS_linking/
+data/raw/fred/fred_master.csv
+
+# data/clean/: ignore large derivative artifacts but keep small docs/metadata.
+# Note: a bare `data/clean/` directory-ignore would block all !-exceptions
+# below (git can't re-include a file whose parent directory is excluded), so
+# we ignore the heavy file types explicitly.
+data/clean/*.parquet
+data/clean/*.csv
+data/clean/edges/*.parquet
+data/clean/edges/*.csv
+data/clean/graph_snapshots/
+data/clean/node_index_maps/
+data/clean/split_assignments.parquet
+!data/clean/*.ipynb
+!data/clean/**/phase*_summary.json
+!data/clean/**/graph_metadata.json
+!data/processed/

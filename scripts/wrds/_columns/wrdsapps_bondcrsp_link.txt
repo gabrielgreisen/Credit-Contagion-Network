@@ -1,0 +1,9 @@
+CUSIP
+PERMNO
+PERMCO
+trace_startdt
+trace_enddt
+crsp_startdt
+crsp_enddt
+link_startdt
+link_enddt

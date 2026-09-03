@@ -1,0 +1,10 @@
+gvkey
+cid
+cnms
+ctype
+gareac
+gareat
+salecs
+sid
+stype
+srcdate

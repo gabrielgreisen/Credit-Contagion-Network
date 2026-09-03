@@ -1,0 +1,115 @@
+
+# FRED Data Download Configuration
+
+# Defines every FRED series we want to download.
+#
+#
+# HOW TO ADD A NEW SERIES:
+# Just add an entry under the appropriate category with these 3 fields:
+#   - series_id:   The FRED identifier (from the URL on fred.stlouisfed.org)
+#   - description: Human-readable name (for logs and your reference)
+#   - frequency:   Native publication frequency (daily/monthly/quarterly)
+#                  This tells the resampling logic how to handle it:
+#                    daily     -> averaged to monthly in the master file
+#                    monthly   -> kept as-is
+#                    quarterly -> forward-filled across the 3 months of each quarter
+
+
+# Global date range applied to every series download
+start_date: "1980-01-01"
+end_date: "2024-12-31"
+
+# Output paths (relative to project root)
+output_dir: "data/raw/fred"          # Individual CSVs go here
+master_file: "fred_master.csv"       # Combined file (inside output_dir)
+log_file: "download_log.json"        # Audit trail (inside output_dir)
+
+
+# Series organized by economic category
+
+categories:
+
+  # --- MONETARY POLICY & INTEREST RATES ---
+  
+  monetary_policy_and_interest_rates:
+    description: "Policy rates and yield curve measures"
+    series:
+      - series_id: "FEDFUNDS"
+        description: "Federal Funds Effective Rate"
+        frequency: "monthly"
+
+      - series_id: "GS10"
+        description: "10-Year Treasury Constant Maturity Rate"
+        frequency: "monthly"
+
+      - series_id: "T10Y2Y"
+        description: "10-Year Treasury Minus 2-Year Treasury (Term Spread)"
+        frequency: "daily"
+
+  # --- CREDIT CONDITIONS ---
+  
+  credit_conditions:
+    description: "Corporate bond spreads — credit risk pricing"
+    series:
+      - series_id: "BAA10Y"
+        description: "Moody's BAA Corporate Bond Yield Minus 10-Year Treasury"
+        frequency: "daily"
+
+      - series_id: "BAMLH0A0HYM2"
+        description: "ICE BofA US High Yield Index Option-Adjusted Spread"
+        frequency: "daily"
+
+      - series_id: "BAMLC0A4CBBB"
+        description: "ICE BofA BBB US Corporate Index Option-Adjusted Spread"
+        frequency: "daily"
+
+      - series_id: "DBAA"
+        description: "Moody's Seasoned BAA Corporate Bond Yield"
+        frequency: "daily"
+
+      - series_id: "DAAA"
+        description: "Moody's Seasoned AAA Corporate Bond Yield"
+        frequency: "daily"
+
+  # --- MARKET STRESS ---
+  
+  market_stress:
+    description: "Volatility and equity market indicators"
+    series:
+      - series_id: "VIXCLS"
+        description: "CBOE Volatility Index (VIX)"
+        frequency: "daily"
+
+      - series_id: "SP500"
+        description: "S&P 500 Index"
+        frequency: "daily"
+
+  # --- REAL ECONOMY ---
+  
+  real_economy:
+    description: "Output, employment, and production measures"
+    series:
+      - series_id: "A191RL1Q225SBEA"
+        description: "Real GDP Growth Rate (Quarterly, Annualized)"
+        frequency: "quarterly"
+
+      - series_id: "UNRATE"
+        description: "Civilian Unemployment Rate"
+        frequency: "monthly"
+
+      - series_id: "INDPRO"
+        description: "Industrial Production Index"
+        frequency: "monthly"
+
+  # --- BANKING & LIQUIDITY ---
+  
+  banking_and_liquidity:
+    description: "Interbank and short-term funding stress indicators"
+    series:
+      - series_id: "TEDRATE"
+        description: "TED Spread (3-Month LIBOR Minus 3-Month Treasury)"
+        frequency: "daily"
+
+      - series_id: "TB3MS"
+        description: "3-Month Treasury Bill Secondary Market Rate"
+        frequency: "monthly"

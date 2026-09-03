@@ -1,0 +1,72 @@
+# CRSP monthly stock file joined to msenames + msedelist.
+# Column references are qualified with table aliases (a/b/c) to disambiguate
+# columns that exist in multiple tables (e.g. permno).
+# The AS clauses rename to the UPPERCASE labels used in the existing CSV.
+#   a = crsp.msf         (primary stock file)
+#   b = crsp.msenames    (name / classification history)
+#   c = crsp.msedelist   (delisting info)
+
+a.permno AS "PERMNO"
+a.date AS date
+b.nameendt AS "NAMEENDT"
+b.shrcd AS "SHRCD"
+b.exchcd AS "EXCHCD"
+b.siccd AS "SICCD"
+b.ncusip AS "NCUSIP"
+b.ticker AS "TICKER"
+b.comnam AS "COMNAM"
+b.shrcls AS "SHRCLS"
+b.tsymbol AS "TSYMBOL"
+b.naics AS "NAICS"
+b.primexch AS "PRIMEXCH"
+b.trdstat AS "TRDSTAT"
+b.secstat AS "SECSTAT"
+a.permco AS "PERMCO"
+b.issuno AS "ISSUNO"
+b.hexcd AS "HEXCD"
+b.hsiccd AS "HSICCD"
+a.cusip AS "CUSIP"
+c.dclrdt AS "DCLRDT"
+c.dlamt AS "DLAMT"
+c.dlpdt AS "DLPDT"
+c.dlstcd AS "DLSTCD"
+c.nextdt AS "NEXTDT"
+c.paydt AS "PAYDT"
+c.rcrddt AS "RCRDDT"
+c.shrflg AS "SHRFLG"
+c.hsicmg AS "HSICMG"
+c.hsicig AS "HSICIG"
+c.distcd AS "DISTCD"
+c.divamt AS "DIVAMT"
+c.facpr AS "FACPR"
+c.facshr AS "FACSHR"
+c.acperm AS "ACPERM"
+c.accomp AS "ACCOMP"
+c.shrenddt AS "SHRENDDT"
+c.nwperm AS "NWPERM"
+c.dlretx AS "DLRETX"
+c.dlprc AS "DLPRC"
+c.dlret AS "DLRET"
+a.trtscd AS "TRTSCD"
+a.nmsind AS "NMSIND"
+a.mmcnt AS "MMCNT"
+a.nsdinx AS "NSDINX"
+a.bidlo AS "BIDLO"
+a.askhi AS "ASKHI"
+a.prc AS "PRC"
+a.vol AS "VOL"
+a.ret AS "RET"
+a.bid AS "BID"
+a.ask AS "ASK"
+a.shrout AS "SHROUT"
+a.cfacpr AS "CFACPR"
+a.cfacshr AS "CFACSHR"
+a.altprc AS "ALTPRC"
+a.spread AS "SPREAD"
+a.altprcdt AS "ALTPRCDT"
+a.retx AS "RETX"
+a.vwretd
+a.vwretx
+a.ewretd
+a.ewretx
+a.sprtrn

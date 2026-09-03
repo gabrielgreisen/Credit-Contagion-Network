@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org/",
+  "@type": "Dataset",
+  "name": "Credit Contagion Multiplex Firm Network Dataset",
+  "alternateName": "Credit Contagion and Corporate Default Risk",
+  "description": "A multiplex temporal graph dataset of US public firms covering 1961-Q1 through 2026-Q1. The dataset integrates 21 source datasets from WRDS (Compustat, CRSP, TRACE, DealScan, BoardEx, Orbis), FRED, and the LoPucki Bankruptcy Research Database into 32,135 firms over 441,934 firm-years and 1,556,311 firm-quarters. The artifact is 261 quarterly PyTorch Geometric HeteroData snapshots (12.95 GB total) carrying 53 standardized firm-level features, 7 inter-firm relationship layers (supply chain, common creditor, industry 4-digit SIC, industry 3-digit SIC, geographic, ownership, board interlock — 8 HeteroData edge types after adding the supply-chain reverse edge), 2,594 default events derived from LoPucki and Compustat delisting supplements, and TRACE-derived quarterly credit spreads for 139,624 firm-quarters. Designed for research on financial-network risk transmission.",
+  "version": "1.0.0",
+  "dateCreated": "2026-05",
+  "inLanguage": "en",
+  "creator": [
+    {
+      "@type": "Person",
+      "name": "Gabriel Reisen",
+      "affiliation": {
+        "@type": "CollegeOrUniversity",
+        "name": "University of Illinois Urbana-Champaign"
+      },
+      "roleName": "Project Lead"
+    }
+  ],
+  "publisher": {
+    "@type": "CollegeOrUniversity",
+    "name": "University of Illinois Urbana-Champaign",
+    "department": "School of Information Sciences"
+  },
+  "license": "https://github.com/gabrielgreisen/Credit-Contagion-Network/blob/main/LICENSE-DATA.md",
+  "isAccessibleForFree": false,
+  "conditionsOfAccess": "Mixed licensing. Code is unreleased, all rights reserved. The LoPucki-only subset of default events (data/processed/default_events_lopucki_only.parquet) and all FRED downloads (data/raw/fred/) are redistributable. All other data artifacts derived from WRDS-licensed sources (Compustat, CRSP, TRACE, DealScan, BoardEx, FactSet, Orbis) are NOT redistributable; reproducers must re-acquire them through their own WRDS subscription. See LICENSE-DATA.md for the full breakdown.",
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "contentUrl": "https://github.com/gabrielgreisen/Credit-Contagion-Network",
+      "encodingFormat": "application/git",
+      "description": "Source repository containing acquisition scripts, processing pipeline, documentation, and redistributable data artifacts (FRED, LoPucki). WRDS-derived parquets and graph snapshots are not included; regenerate them via the Snakefile after providing your own WRDS credentials."
+    }
+  ],
+  "variableMeasured": "See docs/data_dictionary.md for the full data dictionary. Includes 53 firm-level features (leverage, profitability, liquidity, size, growth, cash flow, activity, market, macro, composite distress score, credit spread), 7 edge-layer schemas, default labels at 1q/4q/8q horizons, and quarterly credit spread targets.",
+  "spatialCoverage": {
+    "@type": "Place",
+    "name": "United States",
+    "geo": {
+      "@type": "GeoShape",
+      "addressCountry": "US"
+    }
+  },
+  "temporalCoverage": "1961-01-01/2026-03-31",
+  "keywords": [
+    "credit risk",
+    "corporate default",
+    "financial networks",
+    "supply chain",
+    "syndicated loans",
+    "graph dataset",
+    "multiplex network",
+    "temporal graph",
+    "WRDS",
+    "Compustat",
+    "CRSP",
+    "TRACE",
+    "DealScan",
+    "LoPucki",
+    "FRED",
+    "bankruptcy",
+    "credit spreads",
+    "PyTorch Geometric"
+  ],
+  "citation": "Reisen, G. (2026). Credit Contagion Multiplex Firm Network Dataset. University of Illinois Urbana-Champaign. https://github.com/gabrielgreisen/Credit-Contagion-Network",
+  "isBasedOn": [
+    {
+      "@type": "Dataset",
+      "name": "Compustat North America Fundamentals (Annual & Quarterly)",
+      "publisher": {
+        "@type": "Organization",
+        "name": "S&P Global / Wharton Research Data Services"
+      }
+    },
+    {
+      "@type": "Dataset",
+      "name": "CRSP Monthly Stock File and Compustat-CRSP Merged Link",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Center for Research in Security Prices"
+      }
+    },
+    {
+      "@type": "Dataset",
+      "name": "FINRA TRACE (Enhanced and Master File)",
+      "publisher": {
+        "@type": "Organization",
+        "name": "FINRA via Wharton Research Data Services"
+      }
+    },
+    {
+      "@type": "Dataset",
+      "name": "LSEG / Refinitiv DealScan and Roberts Dealscan-Compustat Link",
+      "publisher": {
+        "@type": "Organization",
+        "name": "LSEG / Wharton Research Data Services"
+      }
+    },
+    {
+      "@type": "Dataset",
+      "name": "WRDS BoardEx (Networks, Analytics, Composition)",
+      "publisher": {
+        "@type": "Organization",
+        "name": "BoardEx / Wharton Research Data Services"
+      }
+    },
+    {
+      "@type": "Dataset",
+      "name": "Bureau van Dijk Orbis Subsidiaries",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Bureau van Dijk / Moody's Analytics"
+      }
+    },
+    {
+      "@type": "Dataset",
+      "name": "FactSet Revere",
+      "publisher": {
+        "@type": "Organization",
+        "name": "FactSet"
+      }
+    },
+    {
+      "@type": "Dataset",
+      "name": "Federal Reserve Economic Data (FRED)",
+      "url": "https://fred.stlouisfed.org/",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Federal Reserve Bank of St. Louis"
+      }
+    },
+    {
+      "@type": "Dataset",
+      "name": "UCLA-LoPucki Bankruptcy Research Database",
+      "url": "https://lopucki.law.ufl.edu/",
+      "creator": {
+        "@type": "Person",
+        "name": "Lynn M. LoPucki"
+      }
+    }
+  ],
+  "measurementTechnique": [
+    "Standardized fundamental ratios (leverage, profitability, liquidity, growth, cash flow, activity)",
+    "Altman Z-Score / Z' / Z'' composite distress scores",
+    "Trade-by-trade option-adjusted credit spreads (TRACE)",
+    "Multiplex network construction from supply-chain, syndicated-loan, industry, geographic, ownership, and board-interlock relationships"
+  ]
+}

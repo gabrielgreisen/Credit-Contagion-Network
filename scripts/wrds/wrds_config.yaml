@@ -1,0 +1,245 @@
+
+# WRDS Data Download Configuration
+#
+# Each entry under `datasets:` describes one CSV we want to reproduce from a
+# WRDS SQL table (or join of tables). The pipeline:
+#   1. Reads the SELECT list from _columns/<columns_file>.
+#   2. Builds SQL: SELECT <cols> FROM <library.table or join_sql> WHERE <where>.
+#   3. For date-aware datasets, splits the WHERE by chunk_strategy (by_year /
+#      by_year_month) and appends to the output CSV chunk-by-chunk.
+#   4. For snapshots, pulls everything in one query or streams via pandas_chunksize.
+#
+# HOW TO ADD A DATASET:
+#   - Create _columns/<name>.txt with one column per line (or '*' for SELECT *).
+#   - Add an entry to datasets: with required fields (name, library, table,
+#     columns_file, chunk_strategy, output_path).
+#   - Add optional fields as needed: where, date_column, date_start, date_end,
+#     join_sql, column_rename, license_required.
+
+
+default_date_start: "1950-01-01"
+default_date_end:   "2024-12-31"
+
+output_root: "data/raw"
+log_file:    "data/raw/wrds_download_log.json"
+
+defaults:
+  pandas_chunksize: 500000
+  encoding: "utf-8"
+
+
+
+datasets:
+
+  # ==========================================================================
+  # COMPUSTAT — library: comp (accessible)
+  # ==========================================================================
+
+  - name: compustat_yearly
+    library: comp
+    table: funda
+    columns_file: _columns/comp_funda.txt
+    where: "indfmt IN ('INDL','FS') AND datafmt='STD' AND popsrc='D' AND consol='C'"
+    date_column: datadate
+    chunk_strategy: single_query
+    output_path: "compustat/compustat_CIQ_yearly.csv"
+    license_required: comp
+
+  - name: compustat_quarterly
+    library: comp
+    table: fundq
+    columns_file: _columns/comp_fundq.txt
+    where: "indfmt IN ('INDL','FS') AND datafmt='STD' AND popsrc='D' AND consol='C'"
+    date_column: datadate
+    chunk_strategy: by_year
+    output_path: "compustat/compustat_CIQ_quarterly.csv"
+    license_required: comp
+
+  - name: comp_segments
+    library: comp_segments_hist_daily
+    table: wrds_segmerged
+    columns_file: _columns/comp_wrds_segmerged.txt
+    date_column: datadate
+    chunk_strategy: by_year
+    output_path: "compustat/comp_segments_hist_daily.csv"
+    license_required: comp_segments_hist_daily
+
+  - name: comp_segments_customer
+    library: comp_segments_hist_daily
+    table: wrds_seg_customer
+    columns_file: _columns/comp_wrds_seg_customer.txt
+    date_column: datadate
+    chunk_strategy: single_query
+    output_path: "compustat/comp_segments_hist_daily_customer.csv"
+    license_required: comp_segments_hist_daily
+
+  # ==========================================================================
+  # CRSP — library: crsp (accessible)
+  # ==========================================================================
+  #
+  # The existing CRSP.csv is msf joined to msenames (for the NAMEENDT, SHRCD,
+  # EXCHCD, etc. descriptive columns) and msedelist (for the DLRET/DLSTCD
+  # delisting columns). Recreate via a three-way LEFT JOIN.
+
+  - name: crsp_msf
+    library: crsp
+    table: msf
+    columns_file: _columns/crsp_msf.txt
+    join_sql: |
+      FROM crsp.msf a
+      LEFT JOIN crsp.msenames b
+        ON a.permno = b.permno
+       AND b.namedt <= a.date
+       AND a.date <= b.nameendt
+      LEFT JOIN crsp.msedelist c
+        ON a.permno = c.permno
+       AND date_trunc('month', a.date) = date_trunc('month', c.dlstdt)
+    date_column: a.date
+    chunk_strategy: by_year
+    output_path: "crsp/CRSP.csv"
+    license_required: crsp
+
+  - name: crsp_ccm_link
+    library: crsp
+    table: ccmxpf_linktable
+    columns_file: _columns/crsp_ccmxpf_linktable.txt
+    chunk_strategy: single_query
+    output_path: "crsp/crsp_a_ccm.csv"
+    license_required: crsp
+
+  - name: bond_crsp_link
+    library: wrdsapps
+    table: bondcrsp_link
+    columns_file: _columns/wrdsapps_bondcrsp_link.txt
+    chunk_strategy: single_query
+    output_path: "crsp/Bond_CRSP_link.csv"
+    license_required: wrdsapps
+
+  # ==========================================================================
+  # TRACE — library: trace (accessible)
+  # ==========================================================================
+
+  - name: trace_enhanced
+    library: trace
+    table: trace_enhanced
+    columns_file: _columns/trace_enhanced.txt
+    date_column: trd_exctn_dt
+    date_start: "2002-07-01"
+    chunk_strategy: by_year_month
+    output_path: "trace/trace_standard_BTDS.csv"
+    license_required: trace
+
+  - name: trace_master
+    library: trace
+    table: camasterfile
+    columns_file: _columns/trace_master.txt
+    chunk_strategy: single_query
+    output_path: "trace/trace_standard_master_file.csv"
+    license_required: trace
+
+  # ==========================================================================
+  # WRDS LINKING — library: wrdsapps_link_supplychain
+  # ==========================================================================
+
+  - name: supplychain_link
+    library: wrdsapps_link_supplychain
+    table: seglink
+    columns_file: _columns/wrdsapps_link_supplychain.txt
+    chunk_strategy: single_query
+    output_path: "WRDS_linking/wrdsapps_link_supplychain.csv"
+    license_required: wrdsapps_link_supplychain
+
+  # ==========================================================================
+  # ORBIS / BvD — library: bvd_orbis_large (NOT accessible — paid add-on)
+  # ==========================================================================
+  # Pipeline will skip this automatically if the library isn't accessible.
+  # Best guess for the table: ob_all_subs_first_level_l (first-level
+  # subsidiaries, matching the "large_subsidiaries" filename). If the library
+  # is licensed and the column/row counts don't match, try
+  # ob_w_company_profiles_l or ob_additional_company_info_l.
+
+  - name: orbis_large_subsidiaries
+    library: bvd
+    table: ob_all_subs_first_level_lms
+    columns_file: _columns/bvd_orbis_large_subsidiaries.txt
+    chunk_strategy: pandas_chunksize
+    order_by: "bvdid"
+    output_path: "moodys_orbis/bvd_orbis_large_subsidiaries.csv"
+    license_required: bvd
+
+  # ==========================================================================
+  # LSEG DEALSCAN — library: dealscan (accessible)
+  # ==========================================================================
+  # The flattened CSV appears to come from multiple dealscan tables joined
+  # together. dealscan.dealscan is a starter — further join_sql iteration
+  # will be needed to reproduce all 203 columns exactly.
+
+  - name: dealscan
+    library: dealscan
+    table: dealscan
+    columns_file: _columns/dealscan.txt
+    chunk_strategy: single_query
+    output_path: "LSEG/LSEG_Dealscan.csv"
+    license_required: dealscan
+
+  # ==========================================================================
+  # BOARDEX — library: boardex (NOT accessible — paid add-on)
+  # ==========================================================================
+  # Probe returned "listed but denied" — UIUC subscription may not include
+  # these specific tables. Pipeline skips automatically if access denied.
+
+  - name: boardex_networks
+    library: boardex
+    table: na_wrds_company_networks
+    columns_file: _columns/boardex_network_associations.txt
+    where: "associationtype IN ('Listed Org', 'Unlisted Org')"
+    chunk_strategy: single_query
+    output_path: "bordex/bordex_networks_associations.csv"
+    license_required: boardex
+
+  - name: boardex_org_analytics
+    library: boardex
+    table: na_wrds_org_summary
+    columns_file: _columns/boardex_org_analytics.txt
+    date_column: annualreportdate
+    chunk_strategy: by_year
+    output_path: "bordex/bordex_organization_analytics.csv"
+    license_required: boardex
+
+  - name: boardex_org_officers
+    library: boardex
+    table: na_wrds_org_composition
+    columns_file: _columns/boardex_org_officers.txt
+    chunk_strategy: single_query
+    output_path: "bordex/bordex_organization_officers.csv"
+    license_required: boardex
+
+  # ==========================================================================
+  # FACTSET REVERE — library: factsamp_revere (listed, probe pending)
+  # ==========================================================================
+
+  - name: factset_revere_companies
+    library: factsamp_revere
+    table: wrds_company_hist
+    columns_file: _columns/factset_revere_companies.txt
+    chunk_strategy: single_query
+    output_path: "factset/factset_revere_companies.csv"
+    license_required: factsamp_revere
+
+  - name: factset_revere_relationships
+    library: factsamp_revere
+    table: wrds_relationship
+    columns_file: _columns/factset_revere_relationships.txt
+    chunk_strategy: single_query
+    output_path: "factset/factset_revere_relationships.csv"
+    license_required: factsamp_revere
+
+
+
+# Manual artifacts — files distributed by WRDS via the web portal that are
+# not available as SQL tables. The pipeline only verifies their presence.
+
+manual_artifacts:
+  - name: dealscan_compustat_link_xlsx
+    expected_path: "LSEG/Dealscan-Compustat_Linking_Database012024.xlsx"
+    note: "WRDS Linking Suite Excel download. No SQL-table equivalent."

@@ -1,0 +1,23 @@
+# The existing CSV has 82 columns from joining ob_all_subs_first_level_lms
+# with other bvd tables (ob_w_company_profiles_l, ob_additional_company_info_l,
+# ob_contact_info_l, etc.) via the web portal. This column list covers the
+# 18 native columns of the subsidiaries-first-level table. The remaining 64
+# columns would require a multi-table JOIN — scope-creep for this pipeline.
+bvdid
+category_of_company
+_9305
+_9439
+_9306
+contact_ctryiso
+_9300
+_9302
+_9314
+subsidiaries_isinwocoformatted
+subsid_company_liability
+_9308
+_9309
+_35120
+_9345
+_9320
+_9332
+_9332_char

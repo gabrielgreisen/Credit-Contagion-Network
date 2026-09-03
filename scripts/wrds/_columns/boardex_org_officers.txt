@@ -1,0 +1,10 @@
+companyid
+datestartrole
+directorid
+directorname
+companyname
+rolename
+dateendrole
+datestartroleflag
+dateendroleflag
+seniority
