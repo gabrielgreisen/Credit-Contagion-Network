@@ -34,3 +34,14 @@ data/clean/split_assignments.parquet
 !data/clean/*.ipynb
 !data/clean/**/phase*_summary.json
 !data/clean/**/graph_metadata.json
+
+# Safety net: never track tabular/tensor data anywhere in the repo.
+# Firm-level outputs (keyed by gvkey) are Compustat derivatives and are
+# non-redistributable — see LICENSE-DATA.md.
+*.parquet
+*.pt
+*.feather
+*.h5
+*.pkl
+results/models/*_predictions.*
+results/models/wf_scores_*
