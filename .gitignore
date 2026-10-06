@@ -45,3 +45,6 @@ data/clean/split_assignments.parquet
 *.pkl
 results/models/*_predictions.*
 results/models/wf_scores_*
+
+# Entire data folder stays local — never commit it (see LICENSE-DATA.md).
+data/
