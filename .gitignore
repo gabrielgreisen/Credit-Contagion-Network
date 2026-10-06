@@ -48,3 +48,6 @@ results/models/wf_scores_*
 
 # Entire data folder stays local — never commit it (see LICENSE-DATA.md).
 data/
+
+# Results stay local too.
+results/
