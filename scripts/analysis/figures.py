@@ -1,6 +1,6 @@
 """Generate the six findings figures reported in the README Findings section.
 
-Inputs (read from data/clean/ and data/processed/):
+Inputs (read from data/clean/):
   - firm_universe.parquet
   - firm_years.parquet
   - default_events.parquet
@@ -274,7 +274,7 @@ def main(project_root: Path) -> None:
         f.write("# Findings figures\n\n")
         f.write("Each figure is rendered at 150 dpi by ")
         f.write("[`scripts/analysis/figures.py`](../../scripts/analysis/figures.py). ")
-        f.write("All inputs come from `data/clean/` and `data/processed/`.\n\n")
+        f.write("All inputs come from `data/clean/`.\n\n")
         for cap in captions:
             f.write(f"- {cap}\n")
     print(f"\nwrote {index_path}")

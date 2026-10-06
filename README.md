@@ -1,9 +1,5 @@
 # Credit Contagion and Corporate Default Risk
 
-## Author
-
-- Gabriel Reisen — University of Illinois Urbana-Champaign
-
 ## Summary
 
 This project builds a curated, reproducible data pipeline for studying corporate default risk and credit contagion. The motivating idea is that firms do not fail in isolation. Corporate credit risk is usually studied at the level of an individual firm, looking at leverage, profitability, liquidity, and other firm-specific financial indicators. Major economic events such as the 2008 financial crisis and the COVID-19 supply chain disruptions show that financial distress can spread across connected firms, industries, creditors, and markets.
@@ -26,7 +22,7 @@ The Compustat North America Annual and Quarterly Fundamentals files provide firm
 
 The annual file produced 441,934 firm-year observations after standard quality filtering, covering fiscal years 1950 through 2025. The quarterly file produced 1,556,311 firm-quarter observations and is the panel granularity used for the final node feature matrix, because quarterly fundamentals capture intra-year deterioration that annual snapshots miss (a firm can look healthy in December and file for bankruptcy by June). Quarterly Compustat uses a parallel set of mnemonics with a `q` suffix (`atq` for total assets, `saleq` for revenue, etc.) and required a separate field-mapping pass during feature engineering.
 
-Compustat was accessed through WRDS under the University of Illinois academic license. Because of the WRDS license terms, the raw Compustat files cannot be redistributed in this repository. The repository documents the acquisition process and expected file locations so that someone with WRDS access can reproduce the download. Acquisition is automated by `scripts/wrds/download_wrds.py` driven by `scripts/wrds/wrds_config.yaml`.
+Compustat was accessed through WRDS under an academic license. Because of the WRDS license terms, the raw Compustat files cannot be redistributed in this repository. The repository documents the acquisition process and expected file locations so that someone with WRDS access can reproduce the download. Acquisition is automated by `scripts/wrds/download_wrds.py` driven by `scripts/wrds/wrds_config.yaml`.
 
 Repository locations:
 - `scripts/wrds/download_wrds.py`, `scripts/wrds/wrds_config.yaml`
@@ -52,11 +48,10 @@ The LoPucki Bankruptcy Research Database provides bankruptcy event records for m
 
 LoPucki does not include Compustat GVKEY identifiers, so LoPucki cases are matched to Compustat firms using a tiered matching strategy: CIK exact match first, then ticker match, then fuzzy company-name match with manual review of borderline cases. Matched events become the primary source of default labels because Compustat delisting codes alone miss many bankruptcies that are coded as mergers (for example, Lehman Brothers and WorldCom both have Compustat `dlrsn = 10` even though they filed for bankruptcy).
 
-LoPucki is free to use with attribution. The cleaned LoPucki cases file and the LoPucki-only subset of matched default events are redistributable and are included in this repository.
+LoPucki is free to use with attribution. The cleaned LoPucki cases file is included in this repository.
 
 Repository locations:
 - `data/raw/lopucki/` (included in repo, redistributable)
-- `data/processed/default_events_lopucki_only.parquet` (1,055 redistributable events)
 - `data/clean/default_events.parquet` (combined with Compustat supplements, not redistributable)
 
 ### CRSP Monthly Stock File
@@ -96,7 +91,7 @@ All WRDS-licensed sources cannot be redistributed.
 
 All processed and intermediate outputs are stored as Apache Parquet files. Parquet was chosen over CSV for three reasons: column-oriented storage allows reading only the fields needed for a given analysis (the Compustat firm-year file has hundreds of columns but most analyses use a few dozen); built-in compression reduces footprint roughly 5–10× compared with CSV at no read-time cost; and Parquet preserves data types, which matters for fields like GVKEY (categorical string) and `dlrsn` (nullable integer code) where CSV round-trips silently coerce types and introduce bugs. The exception is the LoPucki source file, which arrives as Excel and is converted to CSV during cleaning to preserve human-readability of the small underlying record set.
 
-The repository follows a four-tier directory layout. `data/raw/` holds original downloads from WRDS, FRED, and LoPucki, never modified. `data/clean/` holds cleaned and integrated parquet files plus the per-phase summary JSON files that record counts and validation checks. `data/processed/` holds redistributable derivative files (currently the LoPucki-only default events subset). `data/clean/graph_snapshots/quarterly/` holds the 261 quarterly PyTorch Geometric `HeteroData` files in a `{YYYY}_{Qq}.pt` naming convention. Scripts are organized by lifecycle stage: `scripts/wrds/` and `scripts/fred/` for acquisition, `scripts/processing/` for the six phase scripts, `scripts/analysis/` for figure generation, and `scripts/utils/` for cross-cutting utilities such as the SHA-256 manifest generator. This separation makes it easy to reason about provenance: anything in `data/clean/` was produced by a script in `scripts/processing/`, and anything in `scripts/processing/` reads only from `data/raw/` or earlier-phase outputs in `data/clean/`.
+The repository follows a three-tier directory layout. `data/raw/` holds original downloads from WRDS, FRED, and LoPucki, never modified. `data/clean/` holds cleaned and integrated parquet files plus the per-phase summary JSON files that record counts and validation checks. `data/clean/graph_snapshots/quarterly/` holds the 261 quarterly PyTorch Geometric `HeteroData` files in a `{YYYY}_{Qq}.pt` naming convention. Scripts are organized by lifecycle stage: `scripts/wrds/` and `scripts/fred/` for acquisition, `scripts/processing/` for the six phase scripts, `scripts/analysis/` for figure generation. This separation makes it easy to reason about provenance: anything in `data/clean/` was produced by a script in `scripts/processing/`, and anything in `scripts/processing/` reads only from `data/raw/` or earlier-phase outputs in `data/clean/`.
 
 ### Ethical and Legal Constraints
 
@@ -132,7 +127,7 @@ For FRED, cleaning focused on temporal alignment. The project created aggregatio
 
 For missing values in node features, the project used a tiered approach. Variables with low missingness are forward-filled within firms. Variables with moderate missingness are kept with null indicators so that downstream analyses can account for the fact that the value was missing rather than imputed. Variables with very high missingness are excluded from the core feature set but preserved in the raw data so that the decision is reversible.
 
-For LoPucki, the cleaning steps were converting the original Excel source file into CSV format, normalizing company names (stripping legal suffixes such as "Inc.", "Corp.", "LLC", uppercasing, removing punctuation), and applying the tiered matching strategy described above. Each candidate match was further constrained to require the LoPucki filing date to fall within the firm's active period in the firm universe; this prevented false positives where a current Compustat firm shared a normalized name with a long-defunct bankruptcy filer. Unmatched cases were saved to `lopucki_unmatched.csv` for transparency. To enable partial redistribution under LoPucki's permissive license, the matched events from LoPucki were also saved separately as `default_events_lopucki_only.parquet`, which strips out fields populated from non-redistributable sources.
+For LoPucki, the cleaning steps were converting the original Excel source file into CSV format, normalizing company names (stripping legal suffixes such as "Inc.", "Corp.", "LLC", uppercasing, removing punctuation), and applying the tiered matching strategy described above. Each candidate match was further constrained to require the LoPucki filing date to fall within the firm's active period in the firm universe; this prevented false positives where a current Compustat firm shared a normalized name with a long-defunct bankruptcy filer. Unmatched cases were saved to `lopucki_unmatched.csv` for transparency.
 
 When the same GVKEY appeared in both LoPucki and the Compustat delisting supplements, the project took the **earliest** of the two dates (LoPucki filing date or Compustat `dldte`) as the canonical default date and recorded `source = 'both'`. The median gap between the two dates was 535 days, with LoPucki almost always preceding the Compustat deletion — consistent with the bankruptcy filing happening months before the formal delisting. Taking the earlier date avoids labeling a firm as "not yet defaulted" during a quarter when it had already filed for Chapter 11.
 
@@ -171,8 +166,6 @@ Several extensions are natural next steps now that the curated dataset is in pla
 **Bloomberg SPLC and Capital IQ supplements.** Bloomberg's SPLC supply chain function and Capital IQ's customer relationship data could provide additional supply chain coverage, particularly for international firms not well captured by SEC disclosures. Both are subject to licensing constraints similar to WRDS, but they would extend the data horizontally.
 
 **Downstream modeling.** With the curated graph dataset in place, the natural downstream step is graph-based predictive modeling (for example, graph neural networks for default prediction or credit spread forecasting). This is out of scope for the current curation effort but is the motivating use case that drove the project's network-layer data integration choices.
-
-**FAIR enhancements.** The current metadata uses Schema.org Dataset JSON-LD. A future iteration could publish the LoPucki-only redistributable subset to a persistent repository (Zenodo, Dataverse) with a DOI and a more comprehensive DCAT or DataCite metadata record, producing a citable, version-controlled subset of the dataset for reuse by other researchers.
 
 **Edge-attribute enrichment.** The current edge layers carry minimal attributes (presence and a coarse weight where applicable). Future work could enrich each layer with provenance and strength metadata: for supply chain, the percentage-of-revenue threshold met by each disclosed customer relationship; for common creditor, the dollar-weighted shared exposure rather than a count of shared lenders; for board interlock, the count and seniority of shared directors; for ownership, the percentage held by the parent. Richer edge attributes would let downstream analyses weight contagion channels more precisely and would make the curated artifact more useful as a general-purpose research dataset.
 
@@ -228,26 +221,20 @@ snakemake --cores 4
 ```
 This chains the Phase 3 edge construction, Phase 4 default labels, Phase 6 credit spreads, and Phase 5 graph assembly scripts under `scripts/processing/`. Final outputs are the 261 quarterly graph snapshots under `data/clean/graph_snapshots/quarterly/` plus their metadata. The Snakefile header documents how to run partial pipelines (e.g., `snakemake --until phase4`).
 
-**8. Verify integrity of redistributable files.** From the project root:
-```bash
-sha256sum -c data/MANIFEST.sha256
-```
-This verifies the FRED, LoPucki raw, and LoPucki-only default events files match the committed hashes.
-
-**9. Regenerate Findings figures (optional).**
+**8. Regenerate Findings figures (optional).**
 ```bash
 python scripts/analysis/figures.py
 ```
 Outputs the six PNGs and `figure_index.md` under `results/figures/`.
 
-Detailed acquisition documentation for each of the 21 source datasets, including license terms and exact file paths, is in `docs/data_acquisition.md`. The data dictionary describing every column of every output file, every edge layer schema, and the HeteroData graph schema is in `docs/data_dictionary.md`. Per-source licensing and the rules around derivative-file redistribution are in `LICENSE-DATA.md`. Schema.org dataset metadata is in `metadata.json`.
+Detailed acquisition documentation for each of the 21 source datasets, including license terms and exact file paths, is in `docs/data_acquisition.md`. The data dictionary describing every column of every output file, every edge layer schema, and the HeteroData graph schema is in `docs/data_dictionary.md`. Per-source licensing and the rules around derivative-file redistribution are in `LICENSE-DATA.md`.
 
 ## References
 
 ### Datasets
 
-- Compustat North America Fundamentals (Annual and Quarterly). Standard & Poor's / Wharton Research Data Services. Accessed through University of Illinois Urbana-Champaign WRDS academic subscription.
-- CRSP Monthly Stock File. Center for Research in Security Prices / WRDS. Accessed through UIUC academic subscription.
+- Compustat North America Fundamentals (Annual and Quarterly). Standard & Poor's / Wharton Research Data Services. Accessed through an academic WRDS subscription.
+- CRSP Monthly Stock File. Center for Research in Security Prices / WRDS. Accessed through an academic WRDS subscription.
 - DealScan. Refinitiv / WRDS.
 - TRACE Enhanced and TRACE Master File. Financial Industry Regulatory Authority / WRDS.
 - BoardEx. Wharton Research Data Services.
@@ -273,7 +260,3 @@ Detailed acquisition documentation for each of the 21 source datasets, including
 - Altman, E. I. (1968). Financial ratios, discriminant analysis and the prediction of corporate bankruptcy. *The Journal of Finance* 23(4), 589–609. (Z-score)
 - Merton, R. C. (1974). On the pricing of corporate debt: the risk structure of interest rates. *The Journal of Finance* 29(2), 449–470. (Distance-to-default)
 - Roberts, M. R. & Sufi, A. (2009). Renegotiation of financial contracts: evidence from private credit agreements. *Journal of Financial Economics* 93(2), 159–184. (DealScan-Compustat link)
-
-### Project Repository
-
-Reisen, G. (2026). Credit Contagion and Corporate Default Risk: a curated multiplex temporal graph dataset. https://github.com/gabrielgreisen/Credit-Contagion-Network

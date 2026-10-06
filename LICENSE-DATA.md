@@ -59,9 +59,7 @@ from non-redistributable sources and may **not** be shared:
 - `data/clean/node_index_maps/*.parquet`
 - `data/clean/split_assignments.parquet`
 
-These files are excluded from version control via `.gitignore` and are not
-included in the SHA-256 manifest of redistributable files
-(`data/MANIFEST.sha256`).
+These files are excluded from version control via `.gitignore`.
 
 ## 2. Sources that ARE redistributable
 
@@ -79,12 +77,6 @@ Source: <https://lopucki.law.ufl.edu/>
 Redistributable files in this repository:
 
 - The raw LoPucki download under `data/raw/lopucki/`
-- `data/processed/default_events_lopucki_only.parquet` — the LoPucki-only
-  subset of matched default events (1,055 rows). Compustat-sourced columns
-  (`compustat_dldte`) and the combined `default_date` (which mixed the LoPucki
-  filing date with the Compustat delisting date) have been replaced with the
-  pure LoPucki filing date so no Compustat information is carried over. See
-  `scripts/processing/split_lopucki_only.py` for the exact filter.
 
 ### FRED — Federal Reserve Economic Data (public domain)
 
@@ -101,13 +93,11 @@ Redistributable files in this repository:
 - All CSVs under `data/raw/fred/` (27 macro series + Treasury curve tenors +
   `fred_master.csv`)
 
-These are also covered by the SHA-256 manifest.
-
 ## 3. Code
 
 All source code, configuration files, scripts, documentation, notebooks, and
 metadata files in this repository — including everything under `scripts/`,
-`node_processing/`, `docs/`, this file, the `Snakefile`, and `metadata.json` —
+`node_processing/`, `docs/`, this file, and the `Snakefile` —
 are unreleased work, all rights reserved. No public license is granted.
 
 This section covers the code only. The data terms in sections 1 and 2 are

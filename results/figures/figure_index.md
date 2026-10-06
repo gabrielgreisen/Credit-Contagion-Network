@@ -1,6 +1,6 @@
 # Findings figures
 
-Each figure is rendered at 150 dpi by [`scripts/analysis/figures.py`](../../scripts/analysis/figures.py). All inputs come from `data/clean/` and `data/processed/`.
+Each figure is rendered at 150 dpi by [`scripts/analysis/figures.py`](../../scripts/analysis/figures.py). All inputs come from `data/clean/`.
 
 - `firm_year_coverage.png` — Firm-year observations per fiscal year, 1950–2025. Total 441,934 firm-years across the panel.
 - `default_rate_over_time.png` — Annual default rate, computed as firms experiencing a default event in fiscal year ÷ active firms in fiscal year, 1970–2024. Crisis years (2001, 2008, 2020) annotated with dashed vertical lines.

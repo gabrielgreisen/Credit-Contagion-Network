@@ -185,7 +185,7 @@ datasets:
   # ==========================================================================
   # BOARDEX — library: boardex (NOT accessible — paid add-on)
   # ==========================================================================
-  # Probe returned "listed but denied" — UIUC subscription may not include
+  # Probe returned "listed but denied" — the WRDS subscription may not include
   # these specific tables. Pipeline skips automatically if access denied.
 
   - name: boardex_networks

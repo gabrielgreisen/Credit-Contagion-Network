@@ -29,7 +29,6 @@ chained in [`Snakefile`](../Snakefile).
 | 3  | `scripts/processing/phase3_3{1..7}*.py` | Edge layers (7 scripts, one per layer) |
 | 3  | `scripts/processing/phase3_38_validate.py` | Edge validation summary |
 | 4  | `scripts/processing/phase4_default_labels.py` | LoPucki + Compustat default labels |
-| 4b | `scripts/processing/split_lopucki_only.py` | Redistributable LoPucki-only subset |
 | 6  | `scripts/processing/phase6_bond_map.py` | TRACE bond → gvkey mapping |
 | 6  | `scripts/processing/phase6_stream_spreads.py` | Trade-level credit spreads |
 | 6  | `scripts/processing/phase6_aggregate.py` | Quarterly/annual spreads + log_credit_spread feature |
@@ -166,15 +165,6 @@ and is included in this repository (≈ 4 MB). It is consumed by
   and normalized name fallback (1,138 / 1,218 = 93.4% match rate).
 - Combines matched LoPucki bankruptcies with Compustat `dlrsn ∈ {2, 3}`
   delisting supplements to produce 2,594 unique default events.
-
-**Redistributable derivative.** [`scripts/processing/split_lopucki_only.py`](../scripts/processing/split_lopucki_only.py)
-filters the combined `default_events.parquet` to rows sourced from LoPucki
-(`source IN ('lopucki', 'both')`), drops the Compustat-sourced
-`compustat_dldte` column, and replaces `default_date` with the pure LoPucki
-`lopucki_filing_date`. Output:
-
-- `data/processed/default_events_lopucki_only.parquet` (1,055 rows, 1980–2022).
-  Included in `data/MANIFEST.sha256`.
 
 ## Phase 1 manual notebook step
 

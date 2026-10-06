@@ -34,4 +34,3 @@ data/clean/split_assignments.parquet
 !data/clean/*.ipynb
 !data/clean/**/phase*_summary.json
 !data/clean/**/graph_metadata.json
-!data/processed/

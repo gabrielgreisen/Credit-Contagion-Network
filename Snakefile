@@ -19,7 +19,6 @@
 #                                  scripts/processing/phase3_37_board.py
 #                                  scripts/processing/phase3_38_validate.py
 #   - Phase 4 (default labels):    scripts/processing/phase4_default_labels.py
-#                                  scripts/processing/split_lopucki_only.py
 #   - Phase 6 (credit spreads):    scripts/processing/phase6_bond_map.py
 #                                  scripts/processing/phase6_stream_spreads.py
 #                                  scripts/processing/phase6_aggregate.py
@@ -58,7 +57,6 @@ from pathlib import Path
 
 CLEAN = "data/clean"
 EDGES = "data/clean/edges"
-PROCESSED = "data/processed"
 GRAPH = "data/clean/graph_snapshots/quarterly"
 
 # Phase 1 outputs are produced manually by data/clean/firm_cleanup.ipynb.
@@ -73,8 +71,6 @@ rule all:
         # Phase 5 sentinel — all 261 quarterly snapshots produced in one run
         f"{CLEAN}/graph_metadata.json",
         f"{CLEAN}/phase5_summary.json",
-        # Redistributable LoPucki-only events
-        f"{PROCESSED}/default_events_lopucki_only.parquet",
 
 # ----------------------------------------------------------------
 # Phase 0 — Data acquisition
@@ -226,19 +222,9 @@ rule phase4_default_labels:
     shell:
         "python scripts/processing/phase4_default_labels.py"
 
-rule phase4_lopucki_only:
-    # Redistributable subset (no Compustat-sourced columns / dates).
-    input:
-        f"{CLEAN}/default_events.parquet",
-    output:
-        f"{PROCESSED}/default_events_lopucki_only.parquet",
-    shell:
-        "python scripts/processing/split_lopucki_only.py"
-
 rule phase4_done:
     input:
         f"{CLEAN}/default_labels_quarterly.parquet",
-        f"{PROCESSED}/default_events_lopucki_only.parquet",
 
 # ----------------------------------------------------------------
 # Phase 6 — Credit spreads (must run before Phase 5)

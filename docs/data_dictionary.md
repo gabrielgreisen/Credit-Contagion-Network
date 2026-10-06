@@ -178,20 +178,7 @@ lopucki 855 · both 200.
 | `assets_at_filing` | float | LoPucki AssetsPetition (USD millions). |
 | `NameCorp` | string | LoPucki NameCorp (corporate name at filing). |
 
-### 1.5  `data/processed/default_events_lopucki_only.parquet` (redistributable)
-
-**Purpose:** LoPucki-only subset of `default_events.parquet`, stripped of
-Compustat-sourced columns. **Redistributable** (LoPucki license: free with
-attribution).
-
-**Shape:** 1,055 rows × 9 columns. **By source:** lopucki 855 · both 200
-(no compustat-only rows).
-
-Same schema as `default_events.parquet` but **without** `compustat_dldte`,
-and with `default_date := lopucki_filing_date` so the date column is purely
-LoPucki-sourced. See [`scripts/processing/split_lopucki_only.py`](../scripts/processing/split_lopucki_only.py).
-
-### 1.6  `data/clean/default_labels_quarterly.parquet`
+### 1.5  `data/clean/default_labels_quarterly.parquet`
 
 **Purpose:** Quarterly forward-looking default indicators for every active
 firm-quarter.
@@ -210,7 +197,7 @@ firm-quarter.
 `data/clean/default_labels_annual.parquet` has the same structure with
 `fyear` and `default_next_1y` / `default_next_2y` columns (438,085 rows).
 
-### 1.7  `data/clean/credit_spreads_quarterly.parquet`
+### 1.6  `data/clean/credit_spreads_quarterly.parquet`
 
 **Purpose:** Quarterly aggregation of TRACE-derived bond spreads at the
 firm level, used as the regression target and as a feature.
